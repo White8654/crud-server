@@ -1,20 +1,23 @@
-# Use the ARM64-compatible Node.js image as the base
-FROM node:18-alpine-arm64v8
+# Use the official Ubuntu image as the base
+FROM ubuntu:22.04
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Install required dependencies
-RUN apk add --no-cache git openssh curl jq python3 bash
+RUN apt-get update && apt-get install -y \
+    git \
+    openssh-client \
+    curl \
+    jq \
+    python3 \
+    bash \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install the new Salesforce CLI
-RUN npm install @salesforce/cli --global
-
-# Add sf to PATH
-ENV PATH="/usr/local/share/.config/yarn/global/node_modules/@salesforce/cli/bin:${PATH}"
-
-# Create necessary directory for SF CLI
-RUN mkdir -p /root/.local/share/sfdx
+RUN npm install -g @salesforce/cli
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
